@@ -1,6 +1,8 @@
 require "spec_helper"
 
-ActiveRecord::Base.send(:include, SerializeWith)
+ActiveSupport.on_load(:active_record) do
+  self.extend SerializeWith
+end
 
 class Order < ActiveRecord::Base
   serialize_with include: [:order_items]
