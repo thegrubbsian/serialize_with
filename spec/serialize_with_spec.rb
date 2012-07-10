@@ -31,9 +31,9 @@ end
 describe SerializeWith do
 
   before do
-    @customer = Customer.create(last_name: "Smith", first_name: "Carol", address: "123 Address Street")
-    @order = Order.create(customer_id: @customer.id, order_total: 400)
-    @order_item = OrderItem.create(order_id: @order.id, quantity: 7000, product_sku: "skdjfhkjwehr", price: 50.00)
+    @customer = Customer.create!(last_name: "Smith", first_name: "Carol", address: "123 Address Street")
+    @order = Order.create!(customer_id: @customer.id, order_total: 400)
+    @order_item = OrderItem.create!(order_id: @order.id, quantity: 7000, product_sku: "skdjfhkjwehr", price: 50.00)
   end
 
   context "when serialize_with is given an include option" do
@@ -56,7 +56,7 @@ describe SerializeWith do
       @order_item.as_json[:tax_amount].should == @order_item.tax_amount
     end
 
-    it "and a local as_json include option both includes are respected" do
+    specify "and a local as_json include option both includes are respected" do
       json = @order_item.as_json(methods: [:apple_tax_amount])
       json[:tax_amount].should == @order_item.tax_amount
       json[:apple_tax_amount].should == @order_item.apple_tax_amount
