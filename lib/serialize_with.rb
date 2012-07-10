@@ -13,8 +13,10 @@ module SerializeWith
 
   module InstanceMethods
 
-    def serializable_hash(opts = {})
+    def serializable_hash(opts)
       options = self.class.__serialization_options || {}
+      options = options.dup
+      opts ||= {}
 
       options[:include] = [] if options[:include].nil?
       options[:include] += opts[:include].to_a

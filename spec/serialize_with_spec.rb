@@ -79,7 +79,7 @@ describe SerializeWith do
   describe "uber test of all-emcompassing uberness" do
 
     specify "includes model and local includes, excludes model excludes and local excludes, and gets local methods and model methods" do
-      @customer.as_json(include: [:orders]).should == [@order.as_json]
+      @customer.as_json(include: [:orders])[:orders].should == [@order.as_json]
     end
 
   end
