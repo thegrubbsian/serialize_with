@@ -18,8 +18,6 @@ module SerializeWith
 
   module InstanceMethods
 
-    MERGE_KEYS = [:include, :methods, :except]
-
     def as_json(context = nil, options = {})
       super(__prepare_options_arguments(context, options))
     end
@@ -39,7 +37,7 @@ module SerializeWith
     private
 
     def __merge_serialization_options(context, local_options, options)
-      MERGE_KEYS.each do |key|
+      [:include, :methods, :except].each do |key|
         next unless options[context][key]
         local_options[key] ||= []
         local_options[key] += options[context][key]
