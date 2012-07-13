@@ -1,4 +1,5 @@
 require "serialize_with/version"
+require "serialize_with/railtie" if defined?(Rails)
 
 module SerializeWith
 
