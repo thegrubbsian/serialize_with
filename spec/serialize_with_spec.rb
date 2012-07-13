@@ -2,7 +2,7 @@ require "spec_helper"
 
 class Order < ActiveRecord::Base
   serialize_with include: [:order_items]
-  serialize_with :public, include: [:order_items, :customer]
+  serialize_with :private, include: [:order_items, :customer]
   has_many :order_items
   belongs_to :customer
 end
@@ -32,42 +32,55 @@ describe SerializeWith do
     @order_item = OrderItem.create!(order_id: @order.id, quantity: 7000, product_sku: "skdjfhkjwehr", price: 50.00)
   end
 
-  context "when serialize_with is given an include option" do
+  describe "default context" do
 
-    it "it correctly includes the association" do
-      @order.as_json[:order_items].should == [@order_item.as_json]
+    context "when serialize_with is given an include option" do
+
+      it "it correctly includes the association" do
+        @order.as_json[:order_items].should == [@order_item.as_json]
+      end
+
+      it "and a local as_json include option both includes are respected" do
+        json = @order.as_json(include: [:customer])
+        json[:customer].should == @customer.as_json
+        json[:order_items].should == [@order_item.as_json]
+      end
+
     end
 
-    it "and a local as_json include option both includes are respected" do
-      json = @order.as_json(include: [:customer])
-      json[:customer].should == @customer.as_json
-      json[:order_items].should == [@order_item.as_json]
+    context "when serialize_with is given a methods option" do
+
+      it "it correctly includes the method" do
+        @order_item.as_json[:tax_amount].should == @order_item.tax_amount
+      end
+
+      specify "and a local as_json include option both includes are respected" do
+        json = @order_item.as_json(methods: [:apple_tax_amount])
+        json[:tax_amount].should == @order_item.tax_amount
+        json[:apple_tax_amount].should == @order_item.apple_tax_amount
+      end
+
+    end
+
+    context "when serialize_with is given an except option" do
+
+      specify "it correctly excludes the property" do
+        @customer.as_json["last_name"].should be_nil
+      end
+
+      specify "and a local as_json include option both includes are respected" do
+        @customer.as_json(except: [:first_name])["first_name"].should be_nil
+      end
+
     end
 
   end
 
-  context "when serialize_with is given a methods option" do
+  describe "alternate contexts" do
 
-    it "it correctly includes the method" do
-      @order_item.as_json[:tax_amount].should == @order_item.tax_amount
-    end
-
-    specify "and a local as_json include option both includes are respected" do
-      json = @order_item.as_json(methods: [:apple_tax_amount])
-      json[:tax_amount].should == @order_item.tax_amount
-      json[:apple_tax_amount].should == @order_item.apple_tax_amount
-    end
-
-  end
-
-  context "when serialize_with is given an except option" do
-
-    specify "it correctly excludes the property" do
-      @customer.as_json["last_name"].should be_nil
-    end
-
-    specify "and a local as_json include option both includes are respected" do
-      @customer.as_json(except: [:first_name])["first_name"].should be_nil
+    it "apply the correct serialization rules" do
+      @order.as_json.should_not include(:customer)
+      @order.as_json(context: :private)[:customer].should == @customer.as_json
     end
 
   end

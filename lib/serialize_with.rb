@@ -21,22 +21,22 @@ module SerializeWith
     MERGE_KEYS = [:include, :methods, :except]
 
     def serializable_hash(local_options)
-      context = :default
-      options = self.class.__serialization_options
       local_options ||= {}
-      __merge_serialization_options(context, options, local_options)
-      super(options[context])
+      context = local_options[:context] || :default
+      options = self.class.__serialization_options
+      merged_options = __merge_serialization_options(context, local_options, options)
+      super(merged_options)
     end
 
     private
 
-    def __merge_serialization_options(context, options, local_options)
+    def __merge_serialization_options(context, local_options, options)
       MERGE_KEYS.each do |key|
-        local_value = local_options[key].to_a
-        next if local_value.empty?
-        options[context][key] ||= []
-        options[context][key] += local_value
+        next unless options[context][key]
+        local_options[key] ||= []
+        local_options[key] += options[context][key]
       end
+      local_options
     end
 
   end
