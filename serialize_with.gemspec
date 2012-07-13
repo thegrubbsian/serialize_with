@@ -5,6 +5,7 @@ Gem::Specification.new do |gem|
   gem.authors       = ["JC Grubbs", "Kori Roys"]
   gem.email         = ["jc@devmynd.com", "kori@devmynd.com"]
   gem.description   = %q{A simple ActiveRecord add-on for internalizing serialization options within the model.}
+  gem.summary       = %q{A simple ActiveRecord add-on for internalizing serialization options within the model.}
   gem.homepage      = "https://github.com/thegrubbsian/serialize_with"
 
   gem.files         = `git ls-files`.split($\)
