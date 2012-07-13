@@ -2,31 +2,23 @@ require "serialize_with/version"
 
 module SerializeWith
 
-  def self.extended(obj)
-    obj.class_attribute :__serialization_options
-  end
-
   def serialize_with(options)
+    self.class_attribute :__serialization_options
     self.__serialization_options = options
     include InstanceMethods
   end
 
   module InstanceMethods
 
-    def serializable_hash(opts)
-      options = self.class.__serialization_options || {}
-      options = options.dup
-      opts ||= {}
+    MERGE_KEYS = [:include, :methods, :except]
 
-      options[:include] = [] if options[:include].nil?
-      options[:include] += opts[:include].to_a
-
-      options[:methods] = [] if options[:methods].nil?
-      options[:methods] += opts[:methods].to_a
-
-      options[:except] = [] if options[:except].nil?
-      options[:except] += opts[:except].to_a
-
+    def serializable_hash(local_options)
+      options = self.class.__serialization_options.clone
+      local_options ||= {}
+      MERGE_KEYS.each do |key|
+        options[key] = [] unless options[key]
+        options[key] += local_options[key].to_a
+      end
       super(options)
     end
 

@@ -13,14 +13,8 @@ end
 class OrderItem < ActiveRecord::Base
   serialize_with methods: [:tax_amount]
   belongs_to :order
-
-  def tax_amount
-    price * 0.09
-  end
-
-  def apple_tax_amount
-    price * 999
-  end
+  def tax_amount; price * 0.09 end
+  def apple_tax_amount; price * 999 end
 end
 
 class Customer < ActiveRecord::Base

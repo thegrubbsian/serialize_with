@@ -33,3 +33,7 @@ migration.new.migrate(:up)
 RSpec.configure do |config|
   config.mock_with :rspec
 end
+
+ActiveSupport.on_load(:active_record) do
+  self.extend SerializeWith
+end
