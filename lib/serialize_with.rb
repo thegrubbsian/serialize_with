@@ -20,6 +20,14 @@ module SerializeWith
 
     MERGE_KEYS = [:include, :methods, :except]
 
+    def as_json(context = nil, options = {})
+      super(__prepare_options_arguments(context, options))
+    end
+
+    def to_xml(context = nil, options = {})
+      super(__prepare_options_arguments(context, options))
+    end
+
     def serializable_hash(local_options)
       local_options ||= {}
       context = local_options[:context] || :default
@@ -37,6 +45,12 @@ module SerializeWith
         local_options[key] += options[context][key]
       end
       local_options
+    end
+
+    def __prepare_options_arguments(context, options)
+      options[:context] = context if context.is_a?(Symbol)
+      options = context if context.is_a?(Hash)
+      options
     end
 
   end

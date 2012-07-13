@@ -8,11 +8,14 @@ class Order < ActiveRecord::Base
 end
 
 class OrderItem < ActiveRecord::Base
-  serialize_with methods: [:tax_amount]
+  serialize_with methods: [:tax_amount], include: [:product]
   belongs_to :order
+  belongs_to :product
   def tax_amount; price * 0.09 end
   def apple_tax_amount; price * 999 end
 end
+
+class Product < ActiveRecord::Base; end
 
 class Customer < ActiveRecord::Base
   serialize_with except: [:last_name]
@@ -29,7 +32,9 @@ describe SerializeWith do
 
     @customer = Customer.create!(last_name: "Smith", first_name: "Carol", address: "123 Address Street")
     @order = Order.create!(customer_id: @customer.id, order_total: 400)
-    @order_item = OrderItem.create!(order_id: @order.id, quantity: 7000, product_sku: "skdjfhkjwehr", price: 50.00)
+    @product = Product.create!(name: "Banana")
+    @order_item = OrderItem.create!(order_id: @order.id, quantity: 7000, product_id: @product.id,
+                                    product_sku: "skdjfhkjwehr", price: 50.00)
   end
 
   describe "default context" do
@@ -80,17 +85,22 @@ describe SerializeWith do
 
     it "apply the correct serialization rules" do
       @order.as_json.should_not include(:customer)
-      @order.as_json(context: :private)[:customer].should == @customer.as_json
+      @order.as_json(:private)[:customer].should == @customer.as_json
+    end
+
+    it "respects the context and local rules" do
+      json = @order.as_json(:private, except: [:order_total])
+      json[:customer].should == @customer.as_json
+      json["order_total"].should be_nil
     end
 
   end
 
-  #describe "uber test of all-emcompassing uberness" do
-
-    #specify "includes model and local includes, excludes model excludes and local excludes, and gets local methods and model methods" do
-      #@customer.as_json(include: [:order_items])[:order_items].should == [@order_item.as_json]
-    #end
-
-  #end
+  it "all works together as expected :)" do
+    json = @customer.as_json(include: [:order_items])
+    json[:last_name].should be_nil
+    json[:order_items].should == [@order_item.as_json]
+    json[:order_items][0][:product].should == @product.as_json
+  end
 
 end
