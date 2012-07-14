@@ -17,6 +17,9 @@ migration = Class.new(ActiveRecord::Migration) do
     end
     create_table :products, :force => true do |t|
       t.string :name
+      t.string :sku
+      t.string :manufacturer
+      t.decimal :price
     end
     create_table :orders, :force => true do |t|
       t.integer :customer_id

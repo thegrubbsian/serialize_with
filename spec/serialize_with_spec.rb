@@ -15,7 +15,9 @@ class OrderItem < ActiveRecord::Base
   def apple_tax_amount; price * 999 end
 end
 
-class Product < ActiveRecord::Base; end
+class Product < ActiveRecord::Base
+  serialize_with only: [:name, :price]
+end
 
 class Customer < ActiveRecord::Base
   serialize_with except: [:last_name]
@@ -32,20 +34,20 @@ describe SerializeWith do
 
     @customer = Customer.create!(last_name: "Smith", first_name: "Carol", address: "123 Address Street")
     @order = Order.create!(customer_id: @customer.id, order_total: 400)
-    @product = Product.create!(name: "Banana")
+    @product = Product.create!(name: "Banana", price: 140.00, sku: "sdfh3j234k")
     @order_item = OrderItem.create!(order_id: @order.id, quantity: 7000, product_id: @product.id,
                                     product_sku: "skdjfhkjwehr", price: 50.00)
   end
 
   describe "default context" do
 
-    context "when serialize_with is given an include option" do
+    context "when serialize_with is given an include option it" do
 
-      it "it correctly includes the association" do
+      it "returns the association" do
         @order.as_json[:order_items].should == [@order_item.as_json]
       end
 
-      it "and a local as_json include option both includes are respected" do
+      it "allows default and local configuration" do
         json = @order.as_json(include: [:customer])
         json[:customer].should == @customer.as_json
         json[:order_items].should == [@order_item.as_json]
@@ -53,13 +55,13 @@ describe SerializeWith do
 
     end
 
-    context "when serialize_with is given a methods option" do
+    context "when serialize_with is given a methods option it" do
 
-      it "it correctly includes the method" do
+      it "returns the method" do
         @order_item.as_json[:tax_amount].should == @order_item.tax_amount
       end
 
-      specify "and a local as_json include option both includes are respected" do
+      it "allows default and local configuration" do
         json = @order_item.as_json(methods: [:apple_tax_amount])
         json[:tax_amount].should == @order_item.tax_amount
         json[:apple_tax_amount].should == @order_item.apple_tax_amount
@@ -67,14 +69,29 @@ describe SerializeWith do
 
     end
 
-    context "when serialize_with is given an except option" do
+    context "when serialize_with is given an except option it" do
 
-      specify "it correctly excludes the property" do
+      it "does not return the specified property" do
         @customer.as_json["last_name"].should be_nil
       end
 
-      specify "and a local as_json include option both includes are respected" do
-        @customer.as_json(except: [:first_name])["first_name"].should be_nil
+      it "allows local configuration to override the default" do
+        json = @customer.as_json(except: [:first_name])
+        json["first_name"].should be_nil
+        json["last_name"].should == @customer.last_name
+      end
+
+    end
+
+    context "when serialize_with is given an only option" do
+
+      it "returns only the specified properties" do
+        @product.as_json.keys.sort.should == ["name", "price"]
+      end
+
+      it "allows local configuration to override the default" do
+        json = @product.as_json(only: [:price, :sku])
+        json.keys.sort.should == ["price", "sku"]
       end
 
     end
