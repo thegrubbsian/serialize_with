@@ -96,6 +96,15 @@ describe SerializeWith do
 
   end
 
+  # This is not standard as the built-in serialization logic returns
+  # method, includes, except, and only properties with different key
+  # types.
+  it "returns a hash that can be accessed with strings or symbol keys" do
+    json = @order.as_json(:private)
+    json["customer"].should == @customer.as_json
+    json[:customer].should == @customer.as_json
+  end
+
   it "all works together as expected :)" do
     json = @customer.as_json(include: [:order_items])
     json[:last_name].should be_nil

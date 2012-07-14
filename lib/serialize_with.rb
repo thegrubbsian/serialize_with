@@ -32,7 +32,7 @@ module SerializeWith
       context = local_options[:context] || :default
       options = self.class.__serialization_options
       merged_options = __merge_serialization_options(context, local_options, options)
-      super(merged_options)
+      HashWithIndifferentAccess.new(super(merged_options))
     end
 
     private
