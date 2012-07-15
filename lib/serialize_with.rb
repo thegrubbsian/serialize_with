@@ -42,11 +42,11 @@ module SerializeWith
       [:include, :methods].each do |key|
         next unless options[context] && options[context][key]
         local_options[key] ||= []
-        local_options[key] += options[context][key]
+        local_options[key] += Array.wrap(options[context][key])
       end
       [:only, :except].each do |key|
         next unless options[context] && options[context][key]
-        local_options[key] = options[context][key] unless local_options[key]
+        local_options[key] = Array.wrap(options[context][key]) unless local_options[key]
       end
       local_options
     end

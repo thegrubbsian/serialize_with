@@ -3,7 +3,7 @@ require "spec_helper"
 module ActiveRecordSpec
 
   class Order < ActiveRecord::Base
-    serialize_with include: [:order_items]
+    serialize_with include: :order_items
     serialize_with :private, include: [:order_items, :customer]
     has_many :order_items
     belongs_to :customer
@@ -22,7 +22,7 @@ module ActiveRecordSpec
   end
 
   class Customer < ActiveRecord::Base
-    serialize_with except: [:last_name]
+    serialize_with except: :last_name
     has_many :orders
     has_many :order_items, through: :orders
   end

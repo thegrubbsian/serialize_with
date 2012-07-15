@@ -4,8 +4,8 @@ require File.expand_path("../lib/serialize_with/version", __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["JC Grubbs", "Kori Roys"]
   gem.email         = ["jc@devmynd.com", "kori@devmynd.com"]
-  gem.description   = %q{A simple ActiveRecord add-on for internalizing serialization options within the model.}
-  gem.summary       = %q{A simple ActiveRecord add-on for internalizing serialization options within the model.}
+  gem.description   = %q{An add-on for ActiveRecord and Mongoid which allows serialization options to be stored on a model.}
+  gem.summary       = %q{An add-on for ActiveRecord and Mongoid which allows serialization options to be stored on a model.}
   gem.homepage      = "https://github.com/thegrubbsian/serialize_with"
 
   gem.files         = `git ls-files`.split($\)
