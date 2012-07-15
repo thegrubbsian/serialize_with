@@ -1,8 +1,13 @@
 ENV["RAILS_ENV"] = "development"
+ENV["MONGOID_ENV"] = "development"
 
 require "rubygems"
-require "active_record"
 require "serialize_with"
+require "active_record"
+require "mongoid"
+require "mongoid/serialize_with"
+
+Mongoid.load!("#{Dir.pwd}/spec/mongoid.yml")
 
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
 ActiveRecord::Migration.verbose = false
@@ -37,10 +42,10 @@ end
 
 migration.new.migrate(:up)
 
-RSpec.configure do |config|
-  config.mock_with :rspec
-end
-
 ActiveSupport.on_load(:active_record) do
   self.extend SerializeWith
+end
+
+RSpec.configure do |config|
+  config.mock_with :rspec
 end

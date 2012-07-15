@@ -1,41 +1,45 @@
 require "spec_helper"
 
-class Order < ActiveRecord::Base
-  serialize_with include: [:order_items]
-  serialize_with :private, include: [:order_items, :customer]
-  has_many :order_items
-  belongs_to :customer
+module ActiveRecordSpec
+
+  class Order < ActiveRecord::Base
+    serialize_with include: [:order_items]
+    serialize_with :private, include: [:order_items, :customer]
+    has_many :order_items
+    belongs_to :customer
+  end
+
+  class OrderItem < ActiveRecord::Base
+    serialize_with methods: [:tax_amount], include: [:product]
+    belongs_to :order
+    belongs_to :product
+    def tax_amount; price * 0.09 end
+    def apple_tax_amount; price * 999 end
+  end
+
+  class Product < ActiveRecord::Base
+    serialize_with only: [:name, :price]
+  end
+
+  class Customer < ActiveRecord::Base
+    serialize_with except: [:last_name]
+    has_many :orders
+    has_many :order_items, through: :orders
+  end
+
 end
 
-class OrderItem < ActiveRecord::Base
-  serialize_with methods: [:tax_amount], include: [:product]
-  belongs_to :order
-  belongs_to :product
-  def tax_amount; price * 0.09 end
-  def apple_tax_amount; price * 999 end
-end
-
-class Product < ActiveRecord::Base
-  serialize_with only: [:name, :price]
-end
-
-class Customer < ActiveRecord::Base
-  serialize_with except: [:last_name]
-  has_many :orders
-  has_many :order_items, through: :orders
-end
-
-describe SerializeWith do
+describe "SerializeWith ActiveRecord" do
 
   before do
-    Customer.delete_all
-    Order.delete_all
-    OrderItem.delete_all
+    ActiveRecordSpec::Customer.delete_all
+    ActiveRecordSpec::Order.delete_all
+    ActiveRecordSpec::OrderItem.delete_all
 
-    @customer = Customer.create!(last_name: "Smith", first_name: "Carol", address: "123 Address Street")
-    @order = Order.create!(customer_id: @customer.id, order_total: 400)
-    @product = Product.create!(name: "Banana", price: 140.00, sku: "sdfh3j234k")
-    @order_item = OrderItem.create!(order_id: @order.id, quantity: 7000, product_id: @product.id,
+    @customer = ActiveRecordSpec::Customer.create!(last_name: "Smith", first_name: "Carol", address: "123 Address Street")
+    @order = ActiveRecordSpec::Order.create!(customer_id: @customer.id, order_total: 400)
+    @product = ActiveRecordSpec::Product.create!(name: "Banana", price: 140.00, sku: "sdfh3j234k")
+    @order_item = ActiveRecordSpec::OrderItem.create!(order_id: @order.id, quantity: 7000, product_id: @product.id,
                                     product_sku: "skdjfhkjwehr", price: 50.00)
   end
 

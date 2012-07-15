@@ -15,8 +15,10 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = SerializeWith::VERSION
 
-  gem.add_dependency "activerecord", "~>3.0"
+  gem.add_dependency "activesupport", "~>3.0"
 
+  gem.add_development_dependency "activerecord", "~>3.0"
+  gem.add_development_dependency "mongoid", "~>3.0"
   gem.add_development_dependency "rspec"
   gem.add_development_dependency "sqlite3"
 end
