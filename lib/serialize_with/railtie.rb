@@ -3,7 +3,7 @@ module SerializeWith
     initializer "serialize_with.extend_active_record_base" do |app|
       if defined?(ActiveRecord)
         ActiveSupport.on_load(:active_record) do
-          self.send(:include, SerializeWith)
+          ActiveRecord::Base.include SerializeWith
         end
       end
     end
